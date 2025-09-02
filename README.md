@@ -1,167 +1,168 @@
 # 🧠 BrainPatch
 
-A developer-focused memo app built with Expo and TypeScript, designed specifically for capturing and organizing development-related notes, ideas, and documentation.
+アプリ開発に特化したメモアプリです。Expo + TypeScriptで構築され、開発関連のメモ、アイデア、ドキュメントの記録と整理に最適化されています。
 
-## Features
+## 機能
 
-### 📝 Core Functionality
-- **Create, Read, Update, Delete** memos with rich text support
-- **Categorization** system (Bug, Feature, Idea, Note, Todo)
-- **Priority levels** (Low, Medium, High) with visual indicators
-- **Tagging system** for better organization
-- **Search functionality** across all memo content
-- **Category filtering** for focused viewing
+### 📝 基本機能
+- **CRUD操作** - メモの作成、表示、更新、削除をサポート
+- **カテゴリー分け** - バグ、機能、アイデア、ノート、TODOで分類
+- **優先度設定** - 低・中・高の3段階で視覚的に管理
+- **タグシステム** - より柔軟な整理が可能
+- **検索機能** - メモの内容を横断的に検索
+- **カテゴリーフィルタ** - 特定のカテゴリーのみを表示
 
-### 🛠 Developer-Specific Features
-- **Pre-built templates** for common development scenarios:
-  - 🐛 Bug Report Template
-  - ✨ Feature Request Template
-  - 👀 Code Review Notes Template
-  - 📚 Learning Note Template
-  - 🤝 Meeting Notes Template
-  - 🔧 Troubleshooting Log Template
-- **Code snippet support** with syntax highlighting
-- **Markdown-style formatting** in content areas
-- **Development workflow integration**
+### 🛠 開発者向け機能
+- **テンプレート機能** - 開発でよく使用するシーンに対応:
+  - 🐛 バグレポートテンプレート
+  - ✨ 機能リクエストテンプレート
+  - 👀 コードレビューノートテンプレート
+  - 📚 学習ノートテンプレート
+  - 🤝 会議ノートテンプレート
+  - 🔧 トラブルシューティングログテンプレート
+- **コードスニペット対応** - シンタックスハイライト付き
+- **マークダウン風フォーマット** - コンテンツエリアで利用可能
+- **開発ワークフローとの統合**
 
-### 💾 Data Management
-- **SQLite local storage** for offline access
-- **Automatic timestamps** for creation and updates
-- **Data persistence** across app sessions
-- **Search indexing** for fast content discovery
+### 💾 データ管理
+- **マルチプラットフォーム対応** - Web版はIndexedDB、ネイティブ版はSQLiteを使用
+- **オフラインアクセス** - ローカルストレージによる完全オフライン動作
+- **自動タイムスタンプ** - 作成・更新日時を自動記録
+- **データ永続化** - アプリセッション間でのデータ保持
+- **高速検索** - インデックス化による快適な検索体験
 
-## Installation
+## インストール
 
-### Prerequisites
-- Node.js (version 18 or higher)
-- npm or yarn
+### 前提条件
+- Node.js (バージョン18以上)
+- npm または yarn
 - Expo CLI (`npm install -g @expo/cli`)
 
-### Setup
-1. Clone the repository:
+### セットアップ
+1. リポジトリをクローン:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/lumeo3145-del/BrainPatch.git
    cd BrainPatch
    ```
 
-2. Install dependencies:
+2. 依存関係をインストール:
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. 開発サーバーを起動:
    ```bash
    npm start
    ```
 
-4. Run on your preferred platform:
+4. お好みのプラットフォームで実行:
    - **iOS**: `npm run ios`
    - **Android**: `npm run android`
    - **Web**: `npm run web`
 
-## Usage
+## 使用方法
 
-### Creating Memos
-1. **From Template**: Tap the template icon (📚) to choose from developer-focused templates
-2. **Blank Memo**: Tap the + button to create a memo from scratch
-3. Fill in the title, content, select category and priority
-4. Add relevant tags for better organization
+### メモの作成
+1. **テンプレートから**: テンプレートアイコン（📚）をタップして開発向けテンプレートから選択
+2. **白紙から**: +ボタンをタップして一から作成
+3. タイトル、内容を入力し、カテゴリーと優先度を選択
+4. 関連するタグを追加して整理
 
-### Organizing Memos
-- **Categories**: Use the category filter bar to view specific types of memos
-- **Search**: Use the search bar to find memos by title, content, or tags
-- **Priority**: Visual priority indicators help identify urgent items
+### メモの整理
+- **カテゴリー**: カテゴリーフィルターバーで特定の種類のメモを表示
+- **検索**: 検索バーでタイトル、内容、タグから検索
+- **優先度**: 視覚的な優先度インジケーターで緊急度を判断
 
-### Templates
-The app includes several pre-built templates designed for development workflows:
+### テンプレート
+開発ワークフローに最適化された6つのテンプレートを用意:
 
-- **Bug Report**: Structured template for documenting bugs with reproduction steps
-- **Feature Request**: Template for capturing new feature ideas with user stories
-- **Code Review**: Template for organizing code review feedback and action items
-- **Learning Notes**: Template for documenting new technologies and concepts
-- **Meeting Notes**: Template for capturing meeting discussions and action items
-- **Troubleshooting**: Template for logging problem-solving processes
+- **バグレポート**: 再現手順付きのバグ報告用テンプレート
+- **機能リクエスト**: ユーザーストーリー付きの新機能アイデア記録用
+- **コードレビュー**: レビューフィードバックとアクションアイテム整理用
+- **学習ノート**: 新技術や概念の学習記録用
+- **会議ノート**: 会議の議論内容とアクションアイテム記録用
+- **トラブルシューティング**: 問題解決プロセスのログ記録用
 
-## Project Structure
+## プロジェクト構成
 
 ```
 BrainPatch/
-├── App.tsx                 # Main application component
+├── App.tsx                 # メインアプリケーションコンポーネント
 ├── types/
-│   └── index.ts           # TypeScript type definitions
+│   └── index.ts           # TypeScript型定義
 ├── services/
-│   ├── database.ts        # SQLite database operations
-│   └── templates.ts       # Developer template definitions
+│   ├── database.ts        # マルチプラットフォームDB操作
+│   └── templates.ts       # 開発者テンプレート定義
 ├── components/
-│   └── TemplateSelector.tsx # Template selection modal
+│   └── TemplateSelector.tsx # テンプレート選択モーダル
 ├── package.json
-├── app.json              # Expo configuration
+├── app.json              # Expo設定
 └── README.md
 ```
 
-## Technical Stack
+## 技術スタック
 
-- **Framework**: Expo SDK 50
-- **Language**: TypeScript
-- **Database**: SQLite (expo-sqlite)
-- **Storage**: Async Storage for preferences
-- **UI Components**: React Native built-in components
-- **Icons**: @expo/vector-icons (Ionicons)
-- **Navigation**: Built-in modal system
+- **フレームワーク**: Expo SDK 51
+- **言語**: TypeScript
+- **データベース**: SQLite（expo-sqlite）/ IndexedDB（Web）
+- **ストレージ**: AsyncStorage（設定用）
+- **UIコンポーネント**: React Native標準コンポーネント
+- **アイコン**: @expo/vector-icons (Ionicons)
+- **ナビゲーション**: 独自モーダルシステム
 
-## Development
+## 開発
 
-### Adding New Templates
-1. Edit `services/templates.ts`
-2. Add new template object to `developmentTemplates` array
-3. Follow existing template structure with proper categorization
+### 新しいテンプレートの追加
+1. `services/templates.ts`を編集
+2. `developmentTemplates`配列に新しいテンプレートオブジェクトを追加
+3. 既存のテンプレート構造に従って適切にカテゴリー分けしてください
 
-### Database Schema
-The app uses a simple SQLite schema:
-- **id**: Primary key (auto-increment)
-- **title**: Memo title (TEXT)
-- **content**: Memo content (TEXT)
-- **category**: Memo category (TEXT)
-- **priority**: Priority level (TEXT)
-- **tags**: JSON array of tags (TEXT)
-- **created_at**: Creation timestamp (DATETIME)
-- **updated_at**: Last update timestamp (DATETIME)
+### データベーススキーマ
+シンプルなSQLiteスキーマを使用:
+- **id**: 主キー（自動インクリメント）
+- **title**: メモタイトル（TEXT）
+- **content**: メモ内容（TEXT）
+- **category**: メモカテゴリー（TEXT）
+- **priority**: 優先度レベル（TEXT）
+- **tags**: タグのJSON配列（TEXT）
+- **created_at**: 作成タイムスタンプ（DATETIME）
+- **updated_at**: 更新タイムスタンプ（DATETIME）
 
-## Contributing
+## コントリビューション
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1. リポジトリをフォーク
+2. 機能ブランチを作成
+3. 変更を実装
+4. 十分にテスト
+5. プルリクエストを送信
 
-## License
+## ライセンス
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+このプロジェクトはMITライセンスの下でライセンスされています。詳細はLICENSEファイルを参照してください。
 
-## Roadmap
+## ロードマップ
 
-### Planned Features
-- [ ] Export memos to various formats (Markdown, PDF, etc.)
-- [ ] Sync across devices via cloud storage
-- [ ] Code syntax highlighting in memo content
-- [ ] Integration with GitHub/GitLab for issue tracking
-- [ ] Dark mode support
-- [ ] Advanced search with filters
-- [ ] Memo sharing capabilities
-- [ ] Custom template creation
-- [ ] Voice-to-text memo creation
-- [ ] Reminder and notification system
+### 予定している機能
+- [ ] 各種フォーマットへのエクスポート機能（Markdown、PDFなど）
+- [ ] クラウドストレージによるデバイス間同期
+- [ ] メモ内容でのコードシンタックスハイライト
+- [ ] GitHub/GitLabとの連携（Issue追跡）
+- [ ] ダークモード対応
+- [ ] フィルター付き高度検索
+- [ ] メモ共有機能
+- [ ] カスタムテンプレート作成
+- [ ] 音声入力によるメモ作成
+- [ ] リマインダーと通知システム
 
-### Known Issues
-- Template modal may need scrolling on smaller devices
-- Search performance could be optimized for large datasets
-- Code formatting in templates needs improvement
+### 既知の問題
+- 小さいデバイスでテンプレートモーダルのスクロールが必要な場合がある
+- 大量のデータセットでの検索パフォーマンス最適化が必要
+- テンプレート内のコードフォーマット改善が必要
 
-## Support
+## サポート
 
-For issues, questions, or contributions, please open an issue on GitHub or contact the development team.
+問題、質問、コントリビューションについては、GitHubでIssueを開くか開発チームにお問い合わせください。
 
 ---
 
-Built with ❤️ for developers by developers
+開発者による開発者のためのアプリ ❤️
