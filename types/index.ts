@@ -1,5 +1,5 @@
 export interface Memo {
-  id: number;
+  id: number | string;
   title: string;
   content: string;
   category: 'bug' | 'feature' | 'idea' | 'note' | 'todo';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,12 +13,17 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { auth } from './services/firebase';
 import { Memo, MemoInput } from './types';
 import * as Database from './services/database';
 import { TemplateSelector } from './components/TemplateSelector';
 import { MemoTemplate } from './services/templates';
+import AuthScreen from './components/AuthScreen';
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [memos, setMemos] = useState<Memo[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -26,7 +31,8 @@ export default function App() {
   const [editingMemo, setEditingMemo] = useState<Memo | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const categories = ['all', 'bug', 'feature', 'idea', 'note', 'todo'] as const;
+  const categories = ['all', 'bug', 'feature', 'idea', 'note', 'todo'];
+  const memoCategories = ['bug', 'feature', 'idea', 'note', 'todo'] as const;
   const priorities = ['low', 'medium', 'high'] as const;
 
   const [newMemo, setNewMemo] = useState<MemoInput>({
@@ -38,21 +44,31 @@ export default function App() {
   });
 
   useEffect(() => {
-    const initApp = async () => {
-      try {
-        await Database.initDatabase();
-        
-        // AsyncStorageからSQLiteにデータ移行
-        await Database.migrateFromAsyncStorage();
-        
-        await loadMemos();
-      } catch (error) {
-        console.error('Error initializing app:', error);
-        Alert.alert('エラー', 'アプリの初期化に失敗しました');
+    // Firebase認証状態の監視
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setIsLoading(false);
+      if (user) {
+        initApp();
       }
-    };
-    initApp();
+    });
+
+    return unsubscribe;
   }, []);
+
+  const initApp = async () => {
+    try {
+      await Database.initDatabase();
+      
+      // 従来のローカルデータからFirebaseへの移行は今回スキップ
+      // await Database.migrateFromAsyncStorage();
+      
+      await loadMemos();
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      Alert.alert('エラー', 'アプリの初期化に失敗しました');
+    }
+  };
 
   const loadMemos = async () => {
     try {
@@ -189,7 +205,7 @@ export default function App() {
     switch (category) {
       case 'bug': return 'bug-outline';
       case 'feature': return 'bulb-outline';
-      case 'idea': return 'lightbulb-outline';
+      case 'idea': return 'bulb-outline';
       case 'note': return 'document-text-outline';
       case 'todo': return 'checkbox-outline';
       default: return 'document-outline';
@@ -253,13 +269,55 @@ export default function App() {
     </View>
   );
 
+  // ローディング中
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={styles.title}>🧠</Text>
+          <Text style={{ fontSize: 18, color: '#666', marginTop: 16 }}>読み込み中...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // 未認証の場合はログイン画面
+  if (!user) {
+    return (
+      <AuthScreen onAuthSuccess={() => {}} />
+    );
+  }
+
+  // 認証済みの場合はメイン画面
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setMemos([]);
+    } catch (error) {
+      console.error('ログアウトエラー:', error);
+      Alert.alert('エラー', 'ログアウトに失敗しました');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       
       <View style={styles.header}>
-        <Text style={styles.title}>🧠 BrainPatch</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>🧠 BrainPatch</Text>
+          <Text style={styles.subtitle}>
+            {user?.displayName || user?.email}でログイン中
+          </Text>
+        </View>
         <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+          >
+            <Ionicons name="log-out-outline" size={20} color="#666" />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.templateButton}
             onPress={openTemplateSelector}
@@ -361,7 +419,7 @@ export default function App() {
 
             <Text style={styles.fieldLabel}>カテゴリー</Text>
             <View style={styles.optionContainer}>
-              {categories.slice(1).map((category) => (
+              {memoCategories.map((category) => (
                 <TouchableOpacity
                   key={category}
                   style={[
@@ -432,15 +490,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E9ECEF',
   },
+  titleContainer: {
+    flex: 1,
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#2C3E50',
   },
+  subtitle: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  logoutButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
   },
   templateButton: {
     width: 44,

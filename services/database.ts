@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { Memo, MemoInput } from '../types';
+import FirebaseDatabaseImplementation from './firebaseDatabase';
 
 // プラットフォーム別DB実装
 let dbImplementation: DatabaseImplementation;
@@ -7,9 +8,9 @@ let dbImplementation: DatabaseImplementation;
 interface DatabaseImplementation {
   initDatabase(): Promise<void>;
   getAllMemos(limit?: number, offset?: number): Promise<Memo[]>;
-  createMemo(memoInput: MemoInput): Promise<number>;
-  updateMemo(id: number, memoInput: MemoInput): Promise<void>;
-  deleteMemo(id: number): Promise<void>;
+  createMemo(memoInput: MemoInput): Promise<number | string>;
+  updateMemo(id: number | string, memoInput: MemoInput): Promise<void>;
+  deleteMemo(id: number | string): Promise<void>;
   searchMemos(query: string): Promise<Memo[]>;
   getMemosByCategory(category: string): Promise<Memo[]>;
   getMemoStats(): Promise<any>;
@@ -75,7 +76,7 @@ class WebDatabaseImplementation implements DatabaseImplementation {
     });
   }
 
-  async createMemo(memoInput: MemoInput): Promise<number> {
+  async createMemo(memoInput: MemoInput): Promise<number | string> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -99,7 +100,7 @@ class WebDatabaseImplementation implements DatabaseImplementation {
     });
   }
 
-  async updateMemo(id: number, memoInput: MemoInput): Promise<void> {
+  async updateMemo(id: number | string, memoInput: MemoInput): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -130,7 +131,7 @@ class WebDatabaseImplementation implements DatabaseImplementation {
     });
   }
 
-  async deleteMemo(id: number): Promise<void> {
+  async deleteMemo(id: number | string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
@@ -291,7 +292,7 @@ class SQLiteDatabaseImplementation implements DatabaseImplementation {
     return result.map(this.mapRowToMemo);
   }
 
-  async createMemo(memoInput: MemoInput): Promise<number> {
+  async createMemo(memoInput: MemoInput): Promise<number | string> {
     const result = await this.db.runAsync(`
       INSERT INTO memos (title, content, category, priority, tags, updated_at) 
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -300,7 +301,7 @@ class SQLiteDatabaseImplementation implements DatabaseImplementation {
     return result.lastInsertRowId;
   }
 
-  async updateMemo(id: number, memoInput: MemoInput): Promise<void> {
+  async updateMemo(id: number | string, memoInput: MemoInput): Promise<void> {
     await this.db.runAsync(`
       UPDATE memos 
       SET title = ?, content = ?, category = ?, priority = ?, tags = ?, updated_at = CURRENT_TIMESTAMP 
@@ -308,7 +309,7 @@ class SQLiteDatabaseImplementation implements DatabaseImplementation {
     `, [memoInput.title, memoInput.content, memoInput.category, memoInput.priority, JSON.stringify(memoInput.tags), id]);
   }
 
-  async deleteMemo(id: number): Promise<void> {
+  async deleteMemo(id: number | string): Promise<void> {
     await this.db.runAsync('DELETE FROM memos WHERE id = ?', [id]);
   }
 
@@ -389,26 +390,26 @@ class SQLiteDatabaseImplementation implements DatabaseImplementation {
   });
 }
 
-// プラットフォーム別初期化（遅延初期化）
+// データベース実装の初期化（Firebase優先）
 const initializeDatabase = () => {
   try {
-    // Webまたは開発環境での判定を改善
-    const isWeb = Platform.OS === 'web' || 
-                  (typeof window !== 'undefined' && typeof indexedDB !== 'undefined') ||
-                  (typeof navigator !== 'undefined' && navigator.product === 'ReactNative' && Platform.OS === 'web');
+    // Firebase実装を優先使用（クラウド同期のため）
+    console.log('Using Firebase for cloud sync');
+    dbImplementation = new FirebaseDatabaseImplementation();
+  } catch (error) {
+    console.error('Firebase初期化エラー、ローカル実装にフォールバック:', error);
+    
+    // フォールバック: プラットフォーム別ローカル実装
+    const isWeb = (typeof window !== 'undefined' && typeof indexedDB !== 'undefined') ||
+                  (typeof navigator !== 'undefined' && navigator.userAgent.includes('Mozilla'));
     
     if (isWeb) {
-      console.log('Using IndexedDB for web platform');
+      console.log('Using IndexedDB fallback');
       dbImplementation = new WebDatabaseImplementation();
     } else {
-      console.log('Using SQLite for native platform');
+      console.log('Using SQLite fallback');
       dbImplementation = new SQLiteDatabaseImplementation();
     }
-  } catch (error) {
-    console.error('Error initializing database implementation:', error);
-    // フォールバック: Web実装を使用
-    console.log('Falling back to IndexedDB implementation');
-    dbImplementation = new WebDatabaseImplementation();
   }
 };
 
@@ -442,12 +443,12 @@ export const createMemo = async (memoInput: MemoInput) => {
   return dbImplementation.createMemo(memoInput);
 };
 
-export const updateMemo = async (id: number, memoInput: MemoInput) => {
+export const updateMemo = async (id: number | string, memoInput: MemoInput) => {
   await ensureInitialized();
   return dbImplementation.updateMemo(id, memoInput);
 };
 
-export const deleteMemo = async (id: number) => {
+export const deleteMemo = async (id: number | string) => {
   await ensureInitialized();
   return dbImplementation.deleteMemo(id);
 };
